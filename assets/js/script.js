@@ -2,6 +2,63 @@
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
 $(function () {
+     var currentDayEl = $('#currentDay');
+
+//   Used daysjs to format the current date.
+  function displayCurrentDay() {
+    var currentDate = dayjs().format('dddd, MMMM D, YYYY');
+    // Will input the text for the current date on the app.
+    currentDayEl.text(currentDate);
+  }
+
+  // Function to apply the appropriate color coding to each time block
+  function colorCoding() {
+    var currentHour = dayjs().hour();
+
+    $('.time-block').each(function () {
+      var timeBlockHour = parseInt($(this).attr('id').split('-')[1]);
+// 
+      if (timeBlockHour < currentHour) {
+        $(this).addClass('past').removeClass('present future');
+      } else if (timeBlockHour === currentHour) {
+        $(this).addClass('present').removeClass('past future');
+      } else {
+        $(this).addClass('future').removeClass('past present');
+      }
+    });
+  }
+
+  // Function to load saved events from local storage
+  function loadSavedEvents() {
+    $('.time-block').each(function () {
+      var timeBlockId = $(this).attr('id');
+      var savedEvent = localStorage.getItem(timeBlockId);
+
+      if (savedEvent) {
+        $(this).find('.description').val(savedEvent);
+      }
+    });
+  }
+
+  // Function to save an event in local storage
+  function saveEvent() {
+    var timeBlockId = $(this).closest('.time-block').attr('id');
+    var eventDescription = $(this).siblings('.description').val();
+
+    localStorage.setItem(timeBlockId, eventDescription);
+  }
+
+  // Added the click event listener to the save button
+  $('.saveBtn').on('click', saveEvent);
+
+  // Display the current day
+  displayCurrentDay();
+
+  // Apply color coding to each time block
+  colorCoding();
+
+  // Load saved events from local storage
+  loadSavedEvents();
     // TODO: Add a listener for click events on the save button. This code should
     // use the id in the containing time-block as a key to save the user input in
     // local storage. HINT: What does `this` reference in the click listener
